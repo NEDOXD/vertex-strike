@@ -898,7 +898,7 @@ Object.assign(M,{peers:new Map(),id:null,team:0,bots:0,botN:6,scores:{},lw:1,
  clear(){M.peers.forEach(o=>sc.remove(o.g));M.peers.clear()},
  leave(){if(M.room)M.send({t:'leave'});M.room=null;M.on=0;M.clear();$('lobby').classList.add('hid')},
  again(){$('end').classList.add('hid');S='menu';M.on=0;M.clear();bots.forEach(b=>sc.remove(b.g));bots.length=0;gun.visible=false;if(M.room)lobby();else goMenu()},
- begin(){M.on=1;M.clear();M.lw=1;M.scores={};$('lobby').classList.add('hid');start(M.room.mode,M.room.map)},
+ begin(){M.on=1;M.clear();M.lw=1;M.scores={};$('lobby').classList.add('hid');start(M.room.mode,M.room.map);setTimeout(()=>{if(M.on&&S=='play'&&!touchCap&&!document.pointerLockElement)tip('Click the game screen to capture the mouse',6000)},1000)},
  tick(dt){const t=performance.now();
   if(t-lastS>66){lastS=t;M.send({t:'s',p:[+P.p.x.toFixed(2),+P.p.y.toFixed(2),+P.p.z.toFixed(2)],y:+P.yaw.toFixed(3),q:+P.pitch.toFixed(2)})}
   if(M.isHost&&t-lastB>100&&(bots.length||M.hb)){lastB=t;M.hb=bots.length;M.send({t:'bots',w:G.wave,b:bots.map(b=>['b'+(b.mid='b'+b.i).slice(1),+b.g.position.x.toFixed(2),+b.g.position.z.toFixed(2),+b.g.rotation.y.toFixed(2),b.alive?1:0,0,b.i,b.nm])})}
@@ -958,6 +958,7 @@ $('pname').onchange=()=>{ls('vs_name',$('pname').value);M.send({t:'name',n:$('pn
 $('lleave').onclick=()=>{M.leave();openRooms()};$('lgo').onclick=()=>M.send({t:'start'});$('lteam').onclick=()=>M.send({t:'team',tm:1-M.team});
 ['lmap','lbots','lbn'].forEach(i=>$(i).onchange=()=>M.send({t:'cfg',map:+$('lmap').value,bots:$('lbots').checked?1:0,botN:+$('lbn').value}));
 setInterval(()=>{if(!$('rooms').classList.contains('hid'))M.send({t:'list'})},4000);
+document.addEventListener('mousedown',()=>{if(M.on&&S=='play'&&!touchCap&&!document.pointerLockElement)try{$('c').requestPointerLock()}catch(_){}});
 const q=new URLSearchParams(location.search).get('room');if(q&&location.protocol.startsWith('http'))setTimeout(()=>{$('menu').classList.add('hid');conn(()=>M.send({t:'join',code:q}))},700);
 })();
 </script>
